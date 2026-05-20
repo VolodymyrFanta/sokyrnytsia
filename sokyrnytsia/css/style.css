@@ -38,6 +38,7 @@ img { display: block; max-width: 100%; }
   width: 100%;
   height: auto;
   vertical-align: top;
+  display: block;
 }
 .hero-tint {
   position: absolute;
@@ -45,14 +46,23 @@ img { display: block; max-width: 100%; }
   background: rgba(0,0,0,0.42);
   z-index: 0;
 }
-.hero-overlay {
+/* hero-content: sits on top of image, full width */
+.hero-content {
   position: absolute;
-  top: 0; left: 0; right: 0;
+  inset: 0;
   z-index: 1;
-  padding: 1.5rem 1rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+}
+.hero-overlay {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem 0.5rem;
 }
 .hero-no-photo {
   background: var(--green);
@@ -107,9 +117,7 @@ img { display: block; max-width: 100%; }
 /* ── ПОШУК і КАТЕГОРІЇ ───────────────────────────────── */
 .controls {
   background: transparent;
-  padding: 0 1rem 1.25rem;
-  position: relative;
-  z-index: 2;
+  padding: 0 1rem 1rem;
 }
 .search-wrap {
   max-width: 560px;

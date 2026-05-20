@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Адмінка — Сокирниця</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f0ede6;color:#1a1a18;min-height:100vh}
+
+/* TOP */
+.topbar{background:#1a2e0a;color:#fff;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;position:sticky;top:0;z-index:200}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.logo{font-size:15px;font-weight:bold;display:flex;align-items:center;gap:6px}
+.page-switcher{display:flex;gap:4px}
+.pg-btn{padding:6px 12px;border:1.5px solid rgba(255,255,255,0.3);border-radius:6px;font-size:12px;cursor:pointer;background:transparent;color:rgba(255,255,255,0.75);transition:all .15s;font-family:Arial,sans-serif}
+.pg-btn:hover{border-color:rgba(255,255,255,0.7);color:#fff}
+.pg-btn.active{background:#3B6D11;border-color:#3B6D11;color:#fff;font-weight:bold}
+.topbar-right{display:flex;gap:8px}
+.btn{padding:8px 15px;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-family:Arial,sans-serif;font-weight:bold;transition:opacity .15s;white-space:nowrap}
+.btn:hover{opacity:.85}
+.btn-save{background:#3B6D11;color:#fff}
+.btn-preview{background:#1a5276;color:#fff}
+.btn-white{background:#fff;color:#1a2e0a}
+
+/* LAYOUT */
+.workspace{display:flex;height:calc(100vh - 52px)}
+
+/* LEFT SIDEBAR */
+.sidebar{width:280px;min-width:240px;background:#fff;border-right:1px solid #ddd;display:flex;flex-direction:column;overflow:hidden}
+.sidebar-tabs{display:flex;border-bottom:1px solid #eee}
+.stab{flex:1;padding:10px 6px;text-align:center;font-size:11px;font-weight:bold;cursor:pointer;color:#888;border-bottom:2px solid transparent;transition:all .15s}
+.stab:hover{color:#3B6D11}
+.stab.active{color:#3B6D11;border-bottom-color:#3B6D11}
+.sidebar-content{flex:1;overflow-y:auto;padding:10px}
+
+/* BLOCK LIBRARY */
+.block-lib-item{background:#fafafa;border:1.5px dashed #ddd;border-radius:8px;padding:10px;margin-bottom:7px;cursor:grab;display:flex;align-items:center;gap:8px;transition:all .15s;user-select:none}
+.block-lib-item:hover{border-color:#3B6D11;background:#f0f9e8}
+.block-lib-item:active{cursor:grabbing;opacity:.7}
+.lib-icon{font-size:1.3rem;width:30px;text-align:center}
+.lib-info{flex:1}
+.lib-name{font-size:13px;font-weight:bold;color:#1a1a18}
+.lib-desc{font-size:11px;color:#888;margin-top:1px}
+
+/* FORM FIELDS */
+.field{margin-bottom:11px}
+.field label{display:block;font-size:11px;font-weight:bold;color:#555;margin-bottom:4px;text-transform:uppercase;letter-spacing:.03em}
+.field input,.field select,.field textarea{width:100%;padding:8px 10px;border:1.5px solid #ddd;border-radius:7px;font-size:13px;font-family:Arial,sans-serif;color:#1a1a18;outline:none;transition:border-color .15s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#3B6D11}
+.field textarea{resize:vertical;min-height:65px;line-height:1.4}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.section-title{font-size:11px;font-weight:bold;color:#3B6D11;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;margin-top:4px}
+.color-row{display:flex;align-items:center;gap:8px}
+.color-row input[type=color]{width:38px;height:30px;border:1.5px solid #ddd;border-radius:6px;cursor:pointer;padding:2px}
+.swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:3px solid transparent}
+.swatch:hover,.swatch.active{border-color:#333}
+.mini-btn{padding:5px 10px;border:1px solid #ddd;border-radius:6px;font-size:11px;cursor:pointer;background:#fafafa;font-family:Arial,sans-serif;transition:all .15s}
+.mini-btn:hover{border-color:#3B6D11;color:#3B6D11}
+.mini-btn.danger{border-color:#ddd}
+.mini-btn.danger:hover{border-color:#c0392b;color:#c0392b;background:#fff0f0}
+.photo-preview{width:100%;height:70px;border-radius:7px;overflow:hidden;border:1px solid #ddd;background:#f5f5f5;display:flex;align-items:center;justify-content:center;margin-bottom:7px;font-size:1.5rem}
+.photo-preview img{width:100%;height:100%;object-fit:cover}
+.upload-btn{display:inline-block;padding:7px 12px;background:#3B6D11;color:#fff;border-radius:7px;cursor:pointer;font-size:12px;font-weight:bold;font-family:Arial,sans-serif}
+.priority-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
+.pri{padding:4px 9px;border:1.5px solid #ddd;border-radius:10px;font-size:11px;cursor:pointer;background:#fafafa}
+.pri.p-n{border-color:#2980b9;background:#eaf4fb;color:#1a5276}
+.pri.p-i{border-color:#e07b00;background:#fff4e0;color:#7a3e00}
+.pri.p-u{border-color:#c0392b;background:#fdecea;color:#7b241c}
+.emoji-grid{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.emo{font-size:16px;padding:3px 6px;border:1.5px solid #ddd;border-radius:5px;cursor:pointer;background:#fafafa}
+.emo:hover{border-color:#639922;background:#f0f9e8}
+.emo.active{border-color:#3B6D11;background:#e0f0d0}
+.item-row{background:#fafafa;border:1px solid #e5e5e5;border-radius:7px;padding:8px 10px;margin-bottom:6px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:all .15s}
+.item-row:hover{border-color:#3B6D11}
+.item-row.sel{border-color:#3B6D11;background:#f0f9e8}
+.item-name{flex:1;font-size:13px;font-weight:bold;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.item-meta{font-size:11px;color:#888}
+.del-btn{background:none;border:1px solid #ddd;border-radius:5px;padding:2px 6px;cursor:pointer;font-size:11px;color:#888}
+.del-btn:hover{border-color:#c0392b;color:#c0392b;background:#fff0f0}
+
+/* CENTER — PAGE CANVAS */
+.canvas-wrap{flex:1;overflow-y:auto;background:#e8e4dc;padding:20px;display:flex;flex-direction:column;align-items:center}
+.canvas-label{font-size:11px;color:#999;font-family:Arial,sans-serif;margin-bottom:10px;text-align:center}
+.page-canvas{width:100%;max-width:860px;background:#f7f5f0;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.15);min-height:400px}
+
+/* CANVAS BLOCKS */
+.canvas-block{position:relative;border:2px dashed transparent;transition:border-color .15s;cursor:move}
+.canvas-block:hover{border-color:#3B6D11}
+.canvas-block.dragging{opacity:.5;border-color:#3B6D11}
+.canvas-block.drag-over{border-color:#e07b00;background:rgba(224,123,0,0.05)}
+.canvas-block.selected{border-color:#3B6D11;border-style:solid}
+.block-toolbar{display:none;position:absolute;top:-1px;right:0;background:#3B6D11;border-radius:0 0 0 6px;padding:3px 6px;gap:4px;z-index:10;align-items:center}
+.canvas-block:hover .block-toolbar,.canvas-block.selected .block-toolbar{display:flex}
+.tb-btn{background:rgba(255,255,255,0.2);border:none;color:#fff;border-radius:4px;padding:3px 8px;font-size:11px;cursor:pointer;font-family:Arial,sans-serif;font-weight:bold}
+.tb-btn:hover{background:rgba(255,255,255,0.35)}
+.tb-btn.red:hover{background:#c0392b}
+.drag-hint{border:2px dashed #ccc;border-radius:8px;margin:8px;padding:20px;text-align:center;font-size:13px;color:#bbb;font-family:Arial,sans-serif}
+
+/* RIGHT SIDEBAR */
+.props-panel{width:280px;min-width:240px;background:#fff;border-left:1px solid #ddd;overflow-y:auto;padding:14px}
+.props-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;color:#ccc;text-align:center;gap:8px;font-family:Arial,sans-serif;font-size:13px}
+.props-title{font-size:13px;font-weight:bold;color:#1a1a18;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:6px}
+
+/* MINI PREVIEW BLOCKS */
+.prev-hero{background:#3B6D11;color:#fff;padding:16px;text-align:center}
+.prev-hero h2{font-size:14px;font-weight:normal;margin-bottom:2px}
+.prev-hero p{font-size:11px;opacity:.8}
+.prev-nav{background:rgba(0,0,0,0.2);padding:6px;display:flex;justify-content:center;gap:4px}
+.prev-nav span{font-size:10px;padding:3px 8px;border-radius:10px;background:rgba(255,255,255,0.15);color:#fff;font-family:Arial,sans-serif}
+.prev-nav span.a{background:rgba(255,255,255,0.9);color:#3B6D11;font-weight:bold}
+.prev-search{padding:8px;background:rgba(0,0,0,0.15)}
+.prev-search div{background:rgba(255,255,255,.9);border-radius:14px;padding:6px 12px;font-size:11px;color:#999;font-family:Arial,sans-serif}
+.prev-block-inner{padding:10px}
+.prev-news{background:#fff8f0;border-left:3px solid #e07b00;border-radius:4px;padding:7px;margin-bottom:6px;font-family:Arial,sans-serif}
+.prev-news-t{font-size:11px;font-weight:bold;color:#1a1a18}
+.prev-news-d{font-size:10px;color:#888;margin-top:1px}
+.prev-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.prev-card{background:#fff;border:1px solid #eee;border-radius:6px;overflow:hidden}
+.prev-card-img{height:36px;background:#EAF3DE;display:flex;align-items:center;justify-content:center;font-size:1rem}
+.prev-card-body{padding:5px;font-family:Arial,sans-serif}
+.prev-card-tag{font-size:8px;color:#3B6D11;font-weight:bold;text-transform:uppercase}
+.prev-card-name{font-size:9px;font-weight:bold;margin-top:1px}
+.prev-life{background:#fff;border:1px solid #eee;border-radius:6px;padding:7px;margin-bottom:5px;display:flex;gap:6px;font-family:Arial,sans-serif}
+.prev-life-t{font-size:10px;font-weight:bold}
+.prev-life-d{font-size:9px;color:#888}
+.prev-info{background:#fff;border:1px solid #eee;border-radius:6px;padding:7px;margin-bottom:5px;display:flex;gap:6px;font-family:Arial,sans-serif}
+.prev-info-t{font-size:10px;font-weight:bold}
+.prev-info-d{font-size:9px;color:#888}
+
+.badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;font-weight:bold;background:#EAF3DE;color:#3B6D11}
+.add-item-btn{width:100%;padding:8px;border:1.5px dashed #ddd;border-radius:7px;background:#fafafa;color:#888;font-size:12px;cursor:pointer;font-family:Arial,sans-serif;text-align:center;margin-top:6px;transition:all .15s}
+.add-item-btn:hover{border-color:#3B6D11;color:#3B6D11;background:#f0f9e8}
+.divider{height:1px;background:#eee;margin:10px 0}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo">🌿 Адмінка — Сокирниця</div>
+    <div class="page-switcher">
+      <button class="pg-btn active" onclick="switchPage('index',this)">🏠 Головна</button>
+      <button class="pg-btn" onclick="switchPage('life',this)">📰 Життя села</button>
+      <button class="pg-btn" onclick="switchPage('info',this)">ℹ️ Для клієнтів</button>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <button class="btn btn-white" onclick="saveData()">💾 Зберегти data.js</button>
+    <button class="btn btn-preview" onclick="openPreview()">👁 Перегляд</button>
+  </div>
+</div>
+
+<!-- WORKSPACE -->
+<div class="workspace">
+
+  <!-- LEFT: BLOCK LIBRARY + CONTENT EDITOR -->
+  <div class="sidebar">
+    <div class="sidebar-tabs">
+      <div class="stab active" onclick="switchSTab('blocks',this)">Блоки</div>
+      <div class="stab" onclick="switchSTab('content',this)">Контент</div>
+      <div class="stab" onclick="switchSTab('design',this)">Дизайн</div>
+    </div>
+
+    <!-- BLOCKS TAB -->
+    <div class="sidebar-content" id="stab-blocks">
+      <div class="section-title">Перетягни на сторінку</div>
+      <div class="block-lib-item" draggable="true" data-btype="announcements" ondragstart="libDragStart(event)">
+        <div class="lib-icon">📌</div>
+        <div class="lib-info"><div class="lib-name">Дошка оголошень</div><div class="lib-desc">Термінові новини</div></div>
+      </div>
+      <div class="block-lib-item" draggable="true" data-btype="sellers" ondragstart="libDragStart(event)">
+        <div class="lib-icon">🛒</div>
+        <div class="lib-info"><div class="lib-name">Продавці / Картки</div><div class="lib-desc">Сітка з пошуком</div></div>
+      </div>
+      <div class="block-lib-item" draggable="true" data-btype="life" ondragstart="libDragStart(event)">
+        <div class="lib-icon">📰</div>
+        <div class="lib-info"><div class="lib-name">Новини</div><div class="lib-desc">Картки подій</div></div>
+      </div>
+      <div class="block-lib-item" draggable="true" data-btype="info" ondragstart="libDragStart(event)">
+        <div class="lib-icon">ℹ️</div>
+        <div class="lib-info"><div class="lib-name">Інформаційні блоки</div><div class="lib-desc">Правила, контакти</div></div>
+      </div>
+      <div class="block-lib-item" draggable="true" data-btype="text" ondragstart="libDragStart(event)">
+        <div class="lib-icon">📝</div>
+        <div class="lib-info"><div class="lib-name">Текстовий блок</div><div class="lib-desc">Заголовок + текст</div></div>
+      </div>
+      <div class="block-lib-item" draggable="true" data-btype="banner" ondragstart="libDragStart(event)">
+        <div class="lib-icon">🖼</div>
+        <div class="lib-info"><div class="lib-name">Банер</div><div class="lib-desc">Фото + текст поверх</div></div>
+      </div>
+    </div>
+
+    <!-- CONTENT TAB -->
+    <div class="sidebar-content" id="stab-content" style="display:none">
+      <div id="content-panel">
+        <div style="color:#aaa;font-size:13px;text-align:center;padding:20px">Обери тип контенту:</div>
+        <button class="add-item-btn" onclick="showContentEditor('sellers')">🛒 Продавці</button>
+        <button class="add-item-btn" onclick="showContentEditor('announcements')">📌 Оголошення</button>
+        <button class="add-item-btn" onclick="showContentEditor('life')">📰 Новини</button>
+        <button class="add-item-btn" onclick="showContentEditor('info')">ℹ️ Інформація</button>
+      </div>
+    </div>
+
+    <!-- DESIGN TAB -->
+    <div class="sidebar-content" id="stab-design" style="display:none">
+      <div class="section-title">Назва і підзаголовок</div>
+      <div class="field"><label>Назва сайту</label><input id="d-name" oninput="D.design.siteName=this.value;refreshCanvas()"></div>
+      <div class="field"><label>Підзаголовок</label><input id="d-sub" oninput="D.design.siteSubtitle=this.value;refreshCanvas()"></div>
+      <div class="divider"></div>
+      <div class="section-title">Фото шапки</div>
+      <div class="photo-preview" id="header-preview">Немає фото</div>
+      <label class="upload-btn">📷 Завантажити
+        <input type="file" accept="image/*" style="display:none" onchange="uploadHeader(this)">
+      </label>
+      <button class="mini-btn danger" style="margin-left:6px" onclick="D.design.headerPhoto='';refreshHeaderPreview();refreshCanvas()">✕ Прибрати</button>
+      <div class="divider"></div>
+      <div class="section-title">Кольори</div>
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        ${['#3B6D11','#1a5276','#7b241c','#1b2631'].map((c,i)=>
+          `<div class="swatch" style="background:${c}" onclick="applyTheme(${i})"></div>`).join('')}
+      </div>
+      <div class="field"><label>Основний</label><div class="color-row"><input type="color" id="d-green" oninput="D.design.colorGreen=this.value;refreshCanvas()"><span style="font-size:11px;color:#888">Шапка, кнопки</span></div></div>
+      <div class="field"><label>Акцент (ціна)</label><div class="color-row"><input type="color" id="d-amber" oninput="D.design.colorAmber=this.value;refreshCanvas()"><span style="font-size:11px;color:#888">Ціна, деталі</span></div></div>
+      <div class="field"><label>Фон сторінки</label><div class="color-row"><input type="color" id="d-bg" oninput="D.design.colorBg=this.value;refreshCanvas()"><span style="font-size:11px;color:#888">Між картками</span></div></div>
+      <div class="divider"></div>
+      <div class="field"><label>Футер</label><input id="d-footer" oninput="D.design.footerText=this.value;refreshCanvas()"></div>
+    </div>
+  </div>
+
+  <!-- CENTER: CANVAS -->
+  <div class="canvas-wrap">
+    <div class="canvas-label">Перетягуй блоки з лівої панелі • Натискай на блок щоб редагувати • Перетягуй блоки між собою щоб міняти порядок</div>
+    <div class="page-canvas" id="canvas"></div>
+  </div>
+
+  <!-- RIGHT: PROPERTIES -->
+  <div class="props-panel" id="props-panel">
+    <div class="props-empty"><span style="font-size:2rem">👆</span>Натисни на блок щоб побачити властивості</div>
+  </div>
+
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────
+const THEMES=[
+  {g:'#3B6D11',a:'#BA7517',b:'#f7f5f0'},
+  {g:'#1a5276',a:'#d35400',b:'#f0f4f8'},
+  {g:'#7b241c',a:'#b7950b',b:'#f9f5f0'},
+  {g:'#1b2631',a:'#2e86c1',b:'#f2f3f4'},
+];
+const EMOJIS_SELLER=['🥚','🍯','🥬','🥩','🐓','🐄','🐖','🥛','🧀','🫙','🌽','🪵','🪚','🔨','🏗️','🧱','🔧','⚡','🔌','🚿','🛠️','🚜','🚐','🚛','🚗','🌱','🌾','🐇','🐑'];
+const EMOJIS_NEWS=['📢','📌','⚠️','💧','🌱','🎉','🛣️','🏫','⛪','🚒','🌿','❄️','☀️','🌧️','🔔','🗳️'];
+const CATS=[{id:'food',label:'Продукти'},{id:'wood',label:'Дрова і дошки'},{id:'service',label:'Майстри'},{id:'transport',label:'Транспорт'},{id:'animals',label:'Тварини'}];
+
+const D = {
+  design:{siteName:'Сокирниця',siteSubtitle:'Товари і послуги від місцевих жителів',footerText:'Щоб додати своє оголошення — зателефонуйте адміністратору',colorGreen:'#3B6D11',colorAmber:'#BA7517',colorBg:'#f7f5f0',headerPhoto:''},
+  sellers:[
+    {id:1,cat:'food',emoji:'🥚',photo:'',name:'Марія Петренко',desc:'Яйця домашні від власних курей. Молоко козяче і коров\'яче.',price:'Яйця — 10 грн/шт',phone:'063 111 22 33'},
+    {id:2,cat:'food',emoji:'🍯',photo:'',name:'Іван Коваль',desc:'Натуральний мед з власної пасіки.',price:'від 200 грн/кг',phone:'050 222 33 44'},
+    {id:3,cat:'wood',emoji:'🪵',photo:'',name:'Василь Дровар',desc:'Дрова колоті сухі. Доставка по селу.',price:'від 1500 грн/скл.',phone:'096 444 55 66'},
+    {id:4,cat:'service',emoji:'🔧',photo:'',name:'Микола Майстер',desc:'Сантехніка, опалення, водопровід.',price:'від 300 грн/год',phone:'067 666 77 88'},
+    {id:5,cat:'transport',emoji:'🚜',photo:'',name:'Олег Тракторист',desc:'Оранка городу, вивіз сміття.',price:'від 500 грн/виїзд',phone:'099 111 22 33'},
+    {id:6,cat:'animals',emoji:'🐓',photo:'',name:'Ганна Курочка',desc:'Курчата бройлери, кури несучки.',price:'від 150 грн/шт',phone:'050 333 44 55'},
+  ],
+  announcements:[
+    {id:101,emoji:'📢',title:'Збори мешканців',text:'В суботу о 16:00 біля сільради.',date:'17.05.2025',priority:'important'},
+    {id:102,emoji:'💧',title:'Перебої з водою',text:'18 травня з 9:00 до 14:00.',date:'17.05.2025',priority:'urgent'},
+  ],
+  lifeNews:[
+    {id:201,emoji:'🎉',title:'День села 2025',text:'15 червня на центральній площі.',date:'10.05.2025'},
+    {id:202,emoji:'🛣️',title:'Ремонт дороги',text:'До кінця травня.',date:'05.05.2025'},
+  ],
+  infoRules:[
+    {id:301,emoji:'📋',title:'Як подати оголошення',text:'Зателефонуйте адміністратору.'},
+    {id:302,emoji:'✅',title:'Вимоги до оголошень',text:'Тільки товари від мешканців.'},
+    {id:303,emoji:'📞',title:'Контакт',text:'097 000 00 00 щодня 9:00–20:00'},
+  ],
+  categories: CATS,
+  pages:{
+    index:[{id:'b1',type:'announcements',visible:true},{id:'b2',type:'sellers',visible:true}],
+    life: [{id:'b3',type:'life',visible:true}],
+    info: [{id:'b4',type:'info',visible:true}],
+  },
+};
+
+let currentPage = 'index';
+let selectedBlockId = null;
+let dragSrcIdx = null;
+let dragFromLib = null;
+let nextBlockId = 10;
+let nextItemId = 500;
+
+// ── TABS ──────────────────────────────────────────────
+function switchSTab(tab, el){
+  ['blocks','content','design'].forEach(t=>{
+    document.getElementById('stab-'+t).style.display = t===tab?'':'none';
+  });
+  document.querySelectorAll('.stab').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  if(tab==='design') loadDesignFields();
+}
+
+function switchPage(page, el){
+  currentPage = page;
+  document.querySelectorAll('.pg-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  selectedBlockId = null;
+  refreshCanvas();
+  document.getElementById('props-panel').innerHTML='<div class="props-empty"><span style="font-size:2rem">👆</span>Натисни на блок</div>';
+}
+
+// ── DESIGN FIELDS ─────────────────────────────────────
+function loadDesignFields(){
+  document.getElementById('d-name').value   = D.design.siteName;
+  document.getElementById('d-sub').value    = D.design.siteSubtitle;
+  document.getElementById('d-footer').value = D.design.footerText;
+  document.getElementById('d-green').value  = D.design.colorGreen;
+  document.getElementById('d-amber').value  = D.design.colorAmber;
+  document.getElementById('d-bg').value     = D.design.colorBg;
+  refreshHeaderPreview();
+}
+
+function refreshHeaderPreview(){
+  const el = document.getElementById('header-preview');
+  el.innerHTML = D.design.headerPhoto
+    ? `<img src="${D.design.headerPhoto}" alt="">`
+    : '<span>Немає фото</span>';
+}
+
+function applyTheme(i){
+  D.design.colorGreen=THEMES[i].g;D.design.colorAmber=THEMES[i].a;D.design.colorBg=THEMES[i].b;
+  loadDesignFields();refreshCanvas();
+}
+
+function uploadHeader(input){
+  const file=input.files[0];if(!file)return;
+  compress(file,1440,500,0.82,b=>{D.design.headerPhoto=b;refreshHeaderPreview();refreshCanvas();});
+}
+
+// ── CANVAS RENDER ─────────────────────────────────────
+function refreshCanvas(){
+  const canvas = document.getElementById('canvas');
+  const blocks = D.pages[currentPage]||[];
+  let html = renderHeroPreview();
+  if(!blocks.length){
+    html += `<div class="drag-hint" id="drop-zone" ondragover="canvasDragOver(event,-1)" ondrop="canvasDrop(event,-1)">Перетягни блок сюди з лівої панелі</div>`;
+  } else {
+    blocks.forEach((b,i)=>{
+      html += `<div class="canvas-block${b.id===selectedBlockId?' selected':''}" 
+        id="cb-${b.id}" draggable="true"
+        ondragstart="blockDragStart(event,${i})"
+        ondragover="canvasDragOver(event,${i})"
+        ondragleave="canvasDragLeave(event)"
+        ondrop="canvasDrop(event,${i})"
+        onclick="selectBlock('${b.id}')">
+        <div class="block-toolbar">
+          <span style="font-size:10px;color:rgba(255,255,255,.7);margin-right:4px">${blockLabel(b.type)}</span>
+          <button class="tb-btn" onclick="event.stopPropagation();moveBlock('${b.id}',-1)" title="Вгору">↑</button>
+          <button class="tb-btn" onclick="event.stopPropagation();moveBlock('${b.id}',1)" title="Вниз">↓</button>
+          <button class="tb-btn" onclick="event.stopPropagation();toggleBlock('${b.id}')" title="${b.visible?'Сховати':'Показати'}">${b.visible?'👁':'🙈'}</button>
+          <button class="tb-btn red" onclick="event.stopPropagation();removeBlock('${b.id}')" title="Видалити">✕</button>
+        </div>
+        ${b.visible ? renderBlockPreview(b) : `<div style="padding:12px;text-align:center;color:#aaa;font-size:12px;font-family:Arial,sans-serif;background:#f5f5f5">🙈 Блок прихований</div>`}
+      </div>`;
+    });
+  }
+  html += `<div style="padding:8px;text-align:center;font-size:11px;color:#aaa;font-family:Arial,sans-serif">— Кінець сторінки —</div>`;
+  canvas.innerHTML = html;
+}
+
+function renderHeroPreview(){
+  const d=D.design;
+  const bg = d.headerPhoto
+    ? `background:url('${d.headerPhoto}') center/cover;`
+    : `background:${d.colorGreen};`;
+  const pageName = currentPage==='index'?'home':currentPage;
+  const nav = [
+    {id:'home',label:'🏠 Головна'},
+    {id:'life',label:'📰 Життя'},
+    {id:'info',label:'ℹ️ Клієнтам'},
+  ];
+  return `<div style="${bg}position:relative;text-align:center;color:#fff">
+    ${d.headerPhoto?'<div style="position:absolute;inset:0;background:rgba(0,0,0,0.4)"></div>':''}
+    <div style="position:relative;z-index:1;padding:14px 8px 4px">
+      <div style="font-size:1.2rem">🌿</div>
+      <div style="font-size:16px;font-weight:normal">${d.siteName}</div>
+      <div style="font-size:11px;opacity:.8;margin-bottom:8px">${d.siteSubtitle}</div>
+    </div>
+    <div style="background:rgba(0,0,0,0.25);padding:5px 8px;display:flex;justify-content:center;gap:4px;position:relative;z-index:1">
+      ${nav.map(n=>`<span style="padding:3px 10px;border-radius:10px;font-size:10px;font-family:Arial,sans-serif;${n.id===pageName?'background:rgba(255,255,255,.9);color:'+d.colorGreen+';font-weight:bold':'background:rgba(255,255,255,.15);color:#fff'}">${n.label}</span>`).join('')}
+    </div>
+    ${currentPage==='index'?`<div style="padding:6px 8px 8px;position:relative;z-index:1;background:rgba(0,0,0,.15)"><div style="background:rgba(255,255,255,.9);border-radius:12px;padding:5px 10px;font-size:11px;color:#999;font-family:Arial,sans-serif;max-width:300px;margin:0 auto">🔍 Пошук...</div></div>`:''}
+  </div>`;
+}
+
+function renderBlockPreview(b){
+  switch(b.type){
+    case 'announcements':
+      return `<div class="prev-block-inner">
+        ${D.announcements.slice(0,2).map(n=>`<div class="prev-news"><div class="prev-news-t">${n.emoji} ${n.title}</div><div class="prev-news-d">${n.text.slice(0,50)}…</div></div>`).join('')}
+        ${D.announcements.length>2?`<div style="font-size:10px;color:#aaa;font-family:Arial,sans-serif;text-align:center">ще ${D.announcements.length-2}...</div>`:''}
+      </div>`;
+    case 'sellers':
+      return `<div class="prev-block-inner">
+        <div class="prev-cards">
+          ${D.sellers.slice(0,3).map(s=>`<div class="prev-card"><div class="prev-card-img">${s.photo?`<img src="${s.photo}" style="width:100%;height:100%;object-fit:cover">`:s.emoji}</div><div class="prev-card-body"><div class="prev-card-tag">${(CATS.find(c=>c.id===s.cat)||{}).label||''}</div><div class="prev-card-name">${s.name}</div></div></div>`).join('')}
+        </div>
+        ${D.sellers.length>3?`<div style="font-size:10px;color:#aaa;font-family:Arial,sans-serif;text-align:center;margin-top:4px">ще ${D.sellers.length-3} продавців</div>`:''}
+      </div>`;
+    case 'life':
+      return `<div class="prev-block-inner">
+        ${D.lifeNews.slice(0,2).map(n=>`<div class="prev-life"><span>${n.emoji}</span><div><div class="prev-life-t">${n.title}</div><div class="prev-life-d">${n.date}</div></div></div>`).join('')}
+      </div>`;
+    case 'info':
+      return `<div class="prev-block-inner">
+        ${D.infoRules.slice(0,2).map(n=>`<div class="prev-info"><span>${n.emoji}</span><div><div class="prev-info-t">${n.title}</div><div class="prev-info-d">${n.text.slice(0,40)}…</div></div></div>`).join('')}
+      </div>`;
+    case 'text':
+      return `<div style="padding:12px;background:#fff"><div style="font-size:13px;font-weight:bold;margin-bottom:4px">${b.heading||'Заголовок'}</div><div style="font-size:11px;color:#666;font-family:Arial,sans-serif">${(b.text||'Текст блоку...').slice(0,80)}</div></div>`;
+    case 'banner':
+      return `<div style="background:${D.design.colorGreen};padding:16px;text-align:center;color:#fff"><div style="font-size:13px;font-weight:bold">${b.heading||'Банер'}</div><div style="font-size:11px;opacity:.8">${b.text||'Текст банеру'}</div></div>`;
+    default: return '';
+  }
+}
+
+function blockLabel(type){
+  return {announcements:'📌 Оголошення',sellers:'🛒 Продавці',life:'📰 Новини',info:'ℹ️ Інформація',text:'📝 Текст',banner:'🖼 Банер'}[type]||type;
+}
+
+// ── BLOCK ACTIONS ─────────────────────────────────────
+function selectBlock(id){
+  selectedBlockId = id;
+  refreshCanvas();
+  const block = (D.pages[currentPage]||[]).find(b=>b.id===id);
+  if(!block) return;
+  showBlockProps(block);
+}
+
+function removeBlock(id){
+  if(!confirm('Видалити блок?')) return;
+  D.pages[currentPage] = D.pages[currentPage].filter(b=>b.id!==id);
+  if(selectedBlockId===id){ selectedBlockId=null; document.getElementById('props-panel').innerHTML='<div class="props-empty"><span style="font-size:2rem">👆</span>Натисни на блок</div>'; }
+  refreshCanvas();
+}
+
+function toggleBlock(id){
+  const b=(D.pages[currentPage]||[]).find(x=>x.id===id);
+  if(b){b.visible=!b.visible;refreshCanvas();}
+}
+
+function moveBlock(id, dir){
+  const arr=D.pages[currentPage]||[];
+  const i=arr.findIndex(b=>b.id===id);
+  if(i<0) return;
+  const ni=i+dir;
+  if(ni<0||ni>=arr.length) return;
+  [arr[i],arr[ni]]=[arr[ni],arr[i]];
+  refreshCanvas();
+}
+
+// ── DRAG & DROP ───────────────────────────────────────
+function libDragStart(e){
+  dragFromLib=e.currentTarget.dataset.btype;
+  dragSrcIdx=null;
+  e.dataTransfer.effectAllowed='copy';
+}
+function blockDragStart(e,i){
+  dragSrcIdx=i;
+  dragFromLib=null;
+  e.dataTransfer.effectAllowed='move';
+  setTimeout(()=>e.target.classList.add('dragging'),0);
+}
+function canvasDragOver(e,i){
+  e.preventDefault();
+  e.dataTransfer.dropEffect=dragFromLib?'copy':'move';
+  document.querySelectorAll('.canvas-block').forEach(el=>el.classList.remove('drag-over'));
+  const blocks=document.querySelectorAll('.canvas-block');
+  if(blocks[i]) blocks[i].classList.add('drag-over');
+}
+function canvasDragLeave(e){
+  e.currentTarget.classList.remove('drag-over');
+}
+function canvasDrop(e,targetIdx){
+  e.preventDefault();
+  document.querySelectorAll('.canvas-block').forEach(el=>{el.classList.remove('drag-over');el.classList.remove('dragging');});
+  const arr=D.pages[currentPage]||(D.pages[currentPage]=[]);
+  if(dragFromLib){
+    const newBlock={id:'b'+nextBlockId++,type:dragFromLib,visible:true};
+    if(dragFromLib==='text'){newBlock.heading='Заголовок';newBlock.text='Введіть текст...';}
+    if(dragFromLib==='banner'){newBlock.heading='Заголовок банеру';newBlock.text='Підзаголовок';newBlock.bgColor=D.design.colorGreen;}
+    if(targetIdx<0||targetIdx>=arr.length) arr.push(newBlock);
+    else arr.splice(targetIdx,0,newBlock);
+    selectedBlockId=newBlock.id;
+  } else if(dragSrcIdx!==null && dragSrcIdx!==targetIdx){
+    const [moved]=arr.splice(dragSrcIdx,1);
+    const insertAt=targetIdx>dragSrcIdx?targetIdx-1:targetIdx;
+    arr.splice(Math.max(0,insertAt),0,moved);
+  }
+  dragFromLib=null; dragSrcIdx=null;
+  refreshCanvas();
+}
+
+// ── BLOCK PROPERTIES ──────────────────────────────────
+function showBlockProps(block){
+  const p=document.getElementById('props-panel');
+  let html=`<div class="props-title">${blockLabel(block.type)} <span style="font-size:10px;color:#aaa;margin-left:auto">ID: ${block.id}</span></div>`;
+  if(block.type==='text'){
+    html+=`<div class="field"><label>Заголовок</label><input value="${esc(block.heading||'')}" oninput="updateBlock('${block.id}','heading',this.value)"></div>
+    <div class="field"><label>Текст</label><textarea oninput="updateBlock('${block.id}','text',this.value)">${esc(block.text||'')}</textarea></div>`;
+  } else if(block.type==='banner'){
+    html+=`<div class="field"><label>Заголовок</label><input value="${esc(block.heading||'')}" oninput="updateBlock('${block.id}','heading',this.value)"></div>
+    <div class="field"><label>Текст</label><input value="${esc(block.text||'')}" oninput="updateBlock('${block.id}','text',this.value)"></div>
+    <div class="field"><label>Колір фону</label><div class="color-row"><input type="color" value="${block.bgColor||D.design.colorGreen}" oninput="updateBlock('${block.id}','bgColor',this.value)"></div></div>`;
+  } else {
+    html+=`<div style="font-size:12px;color:#888;margin-bottom:10px">Контент цього блоку редагується у вкладці <b>Контент</b></div>`;
+    html+=`<button class="add-item-btn" onclick="switchSTab('content',document.querySelectorAll('.stab')[1]);showContentEditor('${block.type}')">✏️ Редагувати контент</button>`;
+  }
+  p.innerHTML=html;
+}
+
+function updateBlock(id,field,value){
+  const b=(D.pages[currentPage]||[]).find(x=>x.id===id);
+  if(b){b[field]=value;refreshCanvas();}
+}
+
+// ── CONTENT EDITOR ────────────────────────────────────
+function showContentEditor(type){
+  const panel=document.getElementById('content-panel');
+  if(!type){
+    panel.innerHTML=`<div style='color:#aaa;font-size:13px;text-align:center;padding:20px'>Обери тип контенту:</div><button class='add-item-btn' onclick='showContentEditor("sellers")'>🛒 Продавці</button><button class='add-item-btn' onclick='showContentEditor("announcements")'>📌 Оголошення</button><button class='add-item-btn' onclick='showContentEditor("life")'>📰 Новини</button><button class='add-item-btn' onclick='showContentEditor("info")'>ℹ️ Інформація</button>`;
+    return;
+  }
+  let items, label, addFn;
+  if(type==='sellers'){items=D.sellers;label='Продавці';}
+  else if(type==='announcements'){items=D.announcements;label='Оголошення';}
+  else if(type==='life'){items=D.lifeNews;label='Новини';}
+  else if(type==='info'){items=D.infoRules;label='Інформація';}
+
+  panel.innerHTML=`
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+      <button class="mini-btn" onclick="showContentEditor(null)">← Назад</button>
+      <span style="font-size:12px;font-weight:bold">${label}</span>
+    </div>
+    ${items.map(item=>`
+      <div class="item-row" onclick="editItem('${type}',${item.id})">
+        <span style="font-size:16px">${item.emoji||'📄'}</span>
+        <div style="flex:1;min-width:0">
+          <div class="item-name">${item.name||item.title||'—'}</div>
+          <div class="item-meta">${item.phone||item.date||''}</div>
+        </div>
+        <button class="del-btn" onclick="event.stopPropagation();deleteItem('${type}',${item.id})">🗑</button>
+      </div>`).join('')}
+    <button class="add-item-btn" onclick="addItem('${type}')">＋ Додати</button>`;
+}
+
+function editItem(type, id){
+  const item = getItems(type).find(x=>x.id===id);
+  if(!item) return;
+  const panel=document.getElementById('content-panel');
+  const emojis = type==='sellers'?EMOJIS_SELLER:EMOJIS_NEWS;
+  let html=`
+    <button class="mini-btn" onclick="showContentEditor('${type}')">← Назад</button>
+    <div class="divider"></div>
+    <div class="section-title">Іконка</div>
+    <div class="emoji-grid">${emojis.map(e=>`<span class="emo${item.emoji===e?' active':''}" onclick="setItemField('${type}',${id},'emoji','${e}');editItem('${type}',${id})">${e}</span>`).join('')}</div>
+    <div class="divider"></div>`;
+
+  if(type==='sellers'){
+    html+=`
+    <div class="field"><label>Ім'я</label><input value="${esc(item.name)}" oninput="setItemField('${type}',${id},'name',this.value)"></div>
+    <div class="field"><label>Категорія</label><select onchange="setItemField('${type}',${id},'cat',this.value)">${CATS.map(c=>`<option value="${c.id}"${item.cat===c.id?' selected':''}>${c.label}</option>`).join('')}</select></div>
+    <div class="field"><label>Телефон</label><input value="${esc(item.phone)}" oninput="setItemField('${type}',${id},'phone',this.value)"></div>
+    <div class="field"><label>Опис</label><textarea oninput="setItemField('${type}',${id},'desc',this.value)">${esc(item.desc)}</textarea></div>
+    <div class="field"><label>Ціна</label><input value="${esc(item.price)}" oninput="setItemField('${type}',${id},'price',this.value)"></div>
+    <div class="field"><label>Фото</label>
+      <div class="photo-preview">${item.photo?`<img src="${item.photo}" alt="">`:item.emoji}</div>
+      <label class="upload-btn" style="font-size:12px;padding:5px 10px">📷 Фото<input type="file" accept="image/*" style="display:none" onchange="uploadItemPhoto('${type}',${id},this)"></label>
+      ${item.photo?`<button class="mini-btn" style="margin-left:6px" onclick="setItemField('${type}',${id},'photo','');editItem('${type}',${id})">✕</button>`:''}
+    </div>`;
+  } else if(type==='announcements'){
+    html+=`
+    <div class="field"><label>Заголовок</label><input value="${esc(item.title)}" oninput="setItemField('${type}',${id},'title',this.value)"></div>
+    <div class="field"><label>Текст</label><textarea oninput="setItemField('${type}',${id},'text',this.value)">${esc(item.text)}</textarea></div>
+    <div class="field"><label>Дата</label><input value="${esc(item.date)}" oninput="setItemField('${type}',${id},'date',this.value)"></div>
+    <div class="section-title">Пріоритет</div>
+    <div class="priority-row">
+      <button class="pri${item.priority==='normal'?' p-n':''}" onclick="setItemField('${type}',${id},'priority','normal');editItem('${type}',${id})">🔵 Звичайне</button>
+      <button class="pri${item.priority==='important'?' p-i':''}" onclick="setItemField('${type}',${id},'priority','important');editItem('${type}',${id})">🟠 Важливе</button>
+      <button class="pri${item.priority==='urgent'?' p-u':''}" onclick="setItemField('${type}',${id},'priority','urgent');editItem('${type}',${id})">🔴 Терміново</button>
+    </div>`;
+  } else {
+    html+=`
+    <div class="field"><label>Заголовок</label><input value="${esc(item.title)}" oninput="setItemField('${type}',${id},'title',this.value)"></div>
+    <div class="field"><label>Текст</label><textarea oninput="setItemField('${type}',${id},'text',this.value)">${esc(item.text)}</textarea></div>
+    ${item.date!==undefined?`<div class="field"><label>Дата</label><input value="${esc(item.date)}" oninput="setItemField('${type}',${id},'date',this.value)"></div>`:''}`;
+  }
+  html+=`<div class="divider"><button class="mini-btn danger" onclick="deleteItem('${type}',${id})">🗑 Видалити</button></div>`;
+  panel.innerHTML=html;
+  refreshCanvas();
+}
+
+function getItems(type){
+  if(type==='sellers') return D.sellers;
+  if(type==='announcements') return D.announcements;
+  if(type==='life') return D.lifeNews;
+  if(type==='info') return D.infoRules;
+  return [];
+}
+
+function setItemField(type,id,field,value){
+  const item=getItems(type).find(x=>x.id===id);
+  if(item){item[field]=value;refreshCanvas();}
+}
+
+function deleteItem(type,id){
+  if(!confirm('Видалити?'))return;
+  if(type==='sellers') D.sellers=D.sellers.filter(x=>x.id!==id);
+  else if(type==='announcements') D.announcements=D.announcements.filter(x=>x.id!==id);
+  else if(type==='life') D.lifeNews=D.lifeNews.filter(x=>x.id!==id);
+  else if(type==='info') D.infoRules=D.infoRules.filter(x=>x.id!==id);
+  showContentEditor(type);
+  refreshCanvas();
+}
+
+function addItem(type){
+  const id=nextItemId++;
+  const today=()=>{const d=new Date();return`${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;};
+  if(type==='sellers') D.sellers.push({id,cat:'food',emoji:'🥚',photo:'',name:'',desc:'',price:'',phone:''});
+  else if(type==='announcements') D.announcements.unshift({id,emoji:'📢',title:'',text:'',date:today(),priority:'normal'});
+  else if(type==='life') D.lifeNews.unshift({id,emoji:'🎉',title:'',text:'',date:today()});
+  else if(type==='info') D.infoRules.push({id,emoji:'📋',title:'',text:''});
+  editItem(type,id);
+  refreshCanvas();
+}
+
+function uploadItemPhoto(type,id,input){
+  const file=input.files[0];if(!file)return;
+  compress(file,600,600,0.75,b=>{setItemField(type,id,'photo',b);setItemField(type,id,'emoji','');editItem(type,id);});
+}
+
+// ── SAVE DATA.JS ──────────────────────────────────────
+function saveData(){
+  const out=`// ╔══════════════════════════════════════════════════════╗
+// ║  data.js — УСІ ДАНІ САЙТУ (згенеровано адмінкою)   ║
+// ╚══════════════════════════════════════════════════════╝
+
+const SiteData = ${JSON.stringify({
+  design: D.design,
+  categories: D.categories,
+  sellers: D.sellers,
+  announcements: D.announcements,
+  lifeNews: D.lifeNews,
+  infoRules: D.infoRules,
+  pages: D.pages,
+}, null, 2)};`;
+
+  const blob=new Blob([out],{type:'text/javascript;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='data.js';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  alert('✅ Файл data.js збережено!\n\nЗаміни його у папці js/ в твоєму GitHub репозиторії.');
+}
+
+function openPreview(){
+  const page=currentPage==='index'?'index':currentPage;
+  window.open(page+'.html','_blank');
+}
+
+// ── HELPERS ───────────────────────────────────────────
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function compress(file,mw,mh,q,cb){
+  const r=new FileReader();
+  r.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      let w=img.width,h=img.height;
+      if(w>mw||h>mh){const ratio=Math.min(mw/w,mh/h);w=Math.round(w*ratio);h=Math.round(h*ratio);}
+      const c=document.createElement('canvas');c.width=w;c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      cb(c.toDataURL('image/jpeg',q));
+    };img.src=e.target.result;
+  };r.readAsDataURL(file);
+}
+
+// INIT
+refreshCanvas();
+loadDesignFields();
+</script>
+</body>
+</html>

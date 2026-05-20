@@ -43,23 +43,27 @@
       return `<div class="site-hero">
         <img class="hero-bg-img" src="${d.headerPhoto}" alt="">
         <div class="hero-tint"></div>
-        <div class="hero-overlay">
-          <span class="header-leaf">🌿</span>
-          <div class="site-title">${d.siteName}</div>
-          <div class="site-sub">${d.siteSubtitle}</div>
+        <div class="hero-content">
+          <div class="hero-overlay">
+            <span class="header-leaf">🌿</span>
+            <div class="site-title">${d.siteName}</div>
+            <div class="site-sub">${d.siteSubtitle}</div>
+          </div>
+          <div class="nav-bar">${navHTML}</div>
+          ${controlsHTML}
         </div>
-        <div class="nav-bar">${navHTML}</div>
-        ${controlsHTML}
       </div>`;
     } else {
       return `<div class="site-hero">
-        <div class="hero-no-photo">
-          <span class="header-leaf">🌿</span>
-          <div class="site-title">${d.siteName}</div>
-          <div class="site-sub">${d.siteSubtitle}</div>
+        <div class="hero-content" style="background:${d.colorGreen}">
+          <div class="hero-overlay" style="position:relative;padding:2rem 1rem 0">
+            <span class="header-leaf">🌿</span>
+            <div class="site-title">${d.siteName}</div>
+            <div class="site-sub">${d.siteSubtitle}</div>
+          </div>
+          <div class="nav-bar no-photo">${navHTML}</div>
+          ${controlsHTML}
         </div>
-        <div class="nav-bar no-photo">${navHTML}</div>
-        ${controlsHTML}
       </div>`;
     }
   }
