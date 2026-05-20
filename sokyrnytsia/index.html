@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Сокирниця — Товари і Послуги</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ШАПКА (заповнюється через JS) -->
+  <div id="hero-mount"></div>
+
+  <!-- ОСНОВНИЙ КОНТЕНТ -->
+  <main class="main" id="main-mount"></main>
+
+  <!-- ФУТЕР -->
+  <footer></footer>
+
+  <!-- МОДАЛЬНЕ ВІКНО -->
+  <div class="modal-overlay" id="modal" onclick="if(event.target===this)window.closeModal()">
+    <div class="modal">
+      <div class="modal-img" id="m-img">
+        <button class="modal-close" onclick="window.closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-tag"   id="m-tag"></div>
+        <div class="modal-name"  id="m-name"></div>
+        <div class="modal-desc"  id="m-desc"></div>
+        <div class="modal-price" id="m-price"></div>
+        <a class="modal-phone-btn" id="m-phone">📞</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/site.js"></script>
+  <script>window.initPage('home');</script>
+</body>
+</html>
